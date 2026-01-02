@@ -1,4 +1,4 @@
-name: Build Official OpenWrt
+name: Build OpenWrt
 
 on:
   schedule:
