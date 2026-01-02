@@ -116,6 +116,14 @@ jobs:
         name: openwrt_bin
         path: /mnt/openwrt/openwrt_bin.zip
 
+    - name: Create Tag
+      run: |
+        TAG_NAME=openwrt-$(date +"%Y%m%d-%H%M")
+        echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
+        git tag -f "$TAG_NAME"
+        git push -f origin "$TAG_NAME"
+
+
     - name: Release
       uses: softprops/action-gh-release@v2
       with:
