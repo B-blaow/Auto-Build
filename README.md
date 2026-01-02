@@ -1,0 +1,2 @@
+yml文件由AI生成
+openwrt、immortalwrt存在python3依赖问题
