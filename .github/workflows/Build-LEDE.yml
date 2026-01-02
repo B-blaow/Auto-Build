@@ -44,7 +44,7 @@ jobs:
         ccache -M $CCACHE_MAXSIZE
         ccache -s
 
-    - name: Restore ccache
+    - name: Restore cache
       uses: actions/cache@v4
       with:
         path: /mnt/ccache_lede
@@ -64,8 +64,15 @@ jobs:
     - name: Run first custom script
       working-directory: /mnt/lede
       run: |
+        set +e
         FILE=$(ls -1 $GITHUB_WORKSPACE/lede*.sh | sed -n '1p' || true)
-        [ -f "$FILE" ] && chmod +x "$FILE" && "$FILE"
+        if [ -f "$FILE" ]; then
+          echo "Running first script: $FILE"
+          chmod +x "$FILE"
+          "$FILE" || true
+        else
+          echo "No first lede*.sh found"
+        fi
 
     - name: Put .config
       run: |
@@ -80,8 +87,15 @@ jobs:
     - name: Run second custom script
       working-directory: /mnt/lede
       run: |
+        set +e
         FILE=$(ls -1 $GITHUB_WORKSPACE/lede*.sh | sed -n '2p' || true)
-        [ -f "$FILE" ] && chmod +x "$FILE" && "$FILE"
+        if [ -f "$FILE" ]; then
+          echo "Running second script: $FILE"
+          chmod +x "$FILE"
+          "$FILE" || true
+        else
+          echo "No second lede*.sh found"
+        fi
 
     - name: Build
       working-directory: /mnt/lede
