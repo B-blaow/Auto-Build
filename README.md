@@ -13,4 +13,4 @@ Auto-Build自动编译lede、immortalwrt、openwrt 官方
 
 yml文件由AI生成
 
-目前openwrt、immortalwrt存在python3依赖问题
+
