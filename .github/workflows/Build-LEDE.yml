@@ -73,7 +73,7 @@ jobs:
         run: |
           cd $WORKDIR
           make clean
-          make defconfig
+          make defconfig V=s
           chmod +x $GITHUB_WORKSPACE/check-defconfig.sh
           bash $GITHUB_WORKSPACE/check-defconfig.sh
 
