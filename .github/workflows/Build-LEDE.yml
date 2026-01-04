@@ -85,29 +85,28 @@ jobs:
           ccache -M $CCACHE_MAXSIZE
           make -j$(nproc) || make -j1 V=s
 
-      - name: Zip BIN
-        working-directory: /mnt/lede/lede
+      - name: Package bin
         run: |
-          zip -r /mnt/lede/lede_bin.zip bin
-
+          cd $WORKDIR
+          zip -r lede_bin.zip bin
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: lede_bin
-          path: /mnt/lede/lede_bin.zip
+          path: $WORKDIR/lede_bin.zip
 
       - name: Create tag
         run: |
           TAG=$(date +"lede-%Y%m%d-%H%M")
           git tag -f "$TAG"
-          git push -f origin "$TAG"
+          git push -f  "$TAG"
           echo "TAG_NAME=$TAG" >> $GITHUB_ENV
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG_NAME }}
-          files: /mnt/lede/lede_bin.zip
+          files: $WORKDIR/lede_bin.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
