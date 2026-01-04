@@ -100,7 +100,7 @@ jobs:
         run: |
           TAG=$(date +"lede-%Y%m%d-%H%M")
           git tag -f "$TAG"
-          git push -f  "$TAG"
+          git push -f origin "$TAG"
           echo "TAG_NAME=$TAG" >> $GITHUB_ENV
 
       - name: Release
