@@ -11,13 +11,8 @@ if [ ! -f ".config" ]; then
   exit 1
 fi
 
-# 判断正确的 config 工具
-if [ -f "./scripts/config" ]; then
-  CONFIG_TOOL="./scripts/config"
-else
-  echo "❌ No usable config tool found!"
-  exit 1
-fi
+# 使用 OpenWrt / ImmortalWrt 工具
+CONFIG_TOOL="./scripts/config"
 
 echo "ℹ️ Using config tool: ${CONFIG_TOOL}"
 echo "================================================="
