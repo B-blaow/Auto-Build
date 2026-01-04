@@ -110,6 +110,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG_NAME }}
-          files: $WORKDIR/openwrt_bin.zip
+          files: ${{ env.WORKDIR }}/openwrt_bin.zip
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
