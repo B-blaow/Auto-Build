@@ -26,15 +26,7 @@ FAILED=0
 # 检查并修复缺失包
 ##################################################
 CHECK_PKGS=(
-  luci-app-ttyd
   nano
-  cloudflared
-  luci-app-cloudflared
-  wireguard-tools
-  kmod-wireguard
-  luci-app-mwan3
-  mwan3
-  luci-i18n-mwan3-zh-cn
 )
 
 for pkg in "${CHECK_PKGS[@]}"; do
