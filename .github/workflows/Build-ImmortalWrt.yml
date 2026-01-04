@@ -75,8 +75,10 @@ jobs:
           cd $WORKDIR
           make clean
           make defconfig
-          chmod +x $GITHUB_WORKSPACE/check-defconfig.sh
-          bash $GITHUB_WORKSPACE/check-defconfig.sh
+          chmod +x $GITHUB_WORKSPACE/check-packages-status.sh
+          bash $GITHUB_WORKSPACE/check-packages-status.sh
+          #chmod +x $GITHUB_WORKSPACE/auto-fix-packages.sh
+          #bash $GITHUB_WORKSPACE/auto-fix-packages.sh
 
       - name: Compile
         run: |
