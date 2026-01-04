@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
 set -e
 
-##################################################
-# 自动修复缺失包
-##################################################
-AUTO_FIX=true
+echo "================================================="
+echo " Auto-fix missing packages in .config (LEDE)"
+echo "================================================="
+
+# 必须存在 .config
+if [ ! -f ".config" ]; then
+  echo "❌ .config not found"
+  exit 1
+fi
 
 ##################################################
-# 要检查的包名（不带 CONFIG_PACKAGE_）
+# 要检查的包（不带 CONFIG_PACKAGE_）
 ##################################################
 CHECK_PKGS=(
   luci-app-ttyd
@@ -31,63 +36,33 @@ CHECK_PKGS=(
   luci-i18n-mwan3-zh-cn
 )
 
-##################################################
-# 前置检查
-##################################################
-[ -f ".config" ] || { echo "❌ .config not found"; exit 1; }
-
-# 判断正确的 config 工具
-if [ -f "./scripts/config" ]; then
-  CONFIG_TOOL="./scripts/config"
-elif [ -f "./scripts/config.sh" ]; then
-  CONFIG_TOOL="./scripts/config.sh"
-else
-  echo "❌ No usable config tool found!"
-  exit 1
-fi
-
-echo "ℹ️ Using config tool: ${CONFIG_TOOL}"
-echo "================================================="
-echo " Auto-fix missing packages in .config"
-echo "================================================="
-
 FIXED=0
-FAILED=0
 
 ##################################################
-# 检测 + 修复
+# 检查并写入 .config
 ##################################################
 for pkg in "${CHECK_PKGS[@]}"; do
   CONF="CONFIG_PACKAGE_${pkg}"
-  SYMBOL="PACKAGE_${pkg}"
 
   if grep -q "^${CONF}=y" .config; then
     echo "✅ ${pkg}: =y"
 
   elif grep -q "^# ${CONF} is not set" .config; then
     echo "⚠️ ${pkg}: is not set"
-    if [ "$AUTO_FIX" = true ]; then
-      echo "   🔧 enable ${pkg}"
-      ${CONFIG_TOOL} set "${SYMBOL}" y || true
-      FIXED=1
-    else
-      FAILED=1
-    fi
+    echo "   🔧 enable ${pkg}"
+    sed -i "s/^# ${CONF} is not set/${CONF}=y/" .config
+    FIXED=1
 
   else
     echo "❌ ${pkg}: not found in .config"
-    if [ "$AUTO_FIX" = true ]; then
-      echo "   🔧 enable ${pkg}"
-      ${CONFIG_TOOL} set "${SYMBOL}" y || true
-      FIXED=1
-    else
-      FAILED=1
-    fi
+    echo "   🔧 add ${pkg}"
+    echo "${CONF}=y" >> .config
+    FIXED=1
   fi
 done
 
 ##################################################
-# 重新整理 .config
+# 让 Kconfig 修正依赖
 ##################################################
 if [ "$FIXED" = 1 ]; then
   echo
@@ -96,16 +71,16 @@ if [ "$FIXED" = 1 ]; then
 fi
 
 ##################################################
-# 二次校验（CI gating）
+# 二次校验
 ##################################################
 echo
 echo "================================================="
 echo " Re-check after auto-fix"
 echo "================================================="
 
+FAILED=0
 for pkg in "${CHECK_PKGS[@]}"; do
   CONF="CONFIG_PACKAGE_${pkg}"
-
   if grep -q "^${CONF}=y" .config; then
     echo "✅ ${pkg}: =y"
   else
@@ -114,9 +89,6 @@ for pkg in "${CHECK_PKGS[@]}"; do
   fi
 done
 
-##################################################
-# CI 结果
-##################################################
 if [ "$FAILED" = 1 ]; then
   echo
   echo "❌ Package check failed"
