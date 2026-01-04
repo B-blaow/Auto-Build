@@ -86,17 +86,16 @@ jobs:
           ccache -M $CCACHE_MAXSIZE
           make -j$(nproc) || make -j1 V=s
 
-      - name: Zip BIN
-        working-directory: /mnt/immortalwrt/immortalwrt
+      - name: Package bin
         run: |
-          zip -r /mnt/immortalwrt/immortalwrt_bin.zip bin
-
+          cd $WORKDIR
+          zip -r immortalwrt_bin.zip bin
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: immortalwrt_bin
-          path: /mnt/immortalwrt/immortalwrt_bin.zip
+          path: $WORKDIR/immortalwrt_bin.zip
 
       - name: Create tag
         run: |
@@ -109,6 +108,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG_NAME }}
-          files: /mnt/immortalwrt/immortalwrt_bin.zip
+          files: $WORKDIR/immortalwrt_bin.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
