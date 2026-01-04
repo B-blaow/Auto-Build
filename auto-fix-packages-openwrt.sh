@@ -27,6 +27,8 @@ FAILED=0
 ##################################################
 CHECK_PKGS=(
   nano
+  iperf3
+  htop
 )
 
 for pkg in "${CHECK_PKGS[@]}"; do
