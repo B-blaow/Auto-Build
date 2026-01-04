@@ -61,7 +61,7 @@ done
 echo "-------------------------------------------------"
 
 ##################################################
-# 可选 SSH（完全手动）
+# 可选 SSH（完全手动，不自动触发）
 ##################################################
 if [ "$ENABLE_SSH" = true ]; then
   echo "🔐 ENABLE_SSH=true → starting SSH session"
@@ -72,14 +72,17 @@ if [ "$ENABLE_SSH" = true ]; then
     sudo apt install -y tmate
   fi
 
-  tmate new-session -d
-  tmate wait tmate-ready
+  # 🔑 必须使用 socket（CI 环境必需）
+  SOCK="/tmp/tmate.sock"
 
-  SSH_CMD=$(tmate display -p '#{tmate_ssh}')
-  WEB_CMD=$(tmate display -p '#{tmate_web}')
+  tmate -S "$SOCK" new-session -d
+  tmate -S "$SOCK" wait tmate-ready
+
+  SSH_CMD=$(tmate -S "$SOCK" display -p '#{tmate_ssh}')
+  WEB_CMD=$(tmate -S "$SOCK" display -p '#{tmate_web}')
 
   echo "==============================================="
-  echo " SSH session ready (valid for ${SSH_WAIT_TIMEOUT}s)"
+  echo " SSH session ready (max ${SSH_WAIT_TIMEOUT}s)"
   echo
   echo " SSH : $SSH_CMD"
   echo " WEB : $WEB_CMD"
@@ -90,22 +93,29 @@ if [ "$ENABLE_SSH" = true ]; then
   ################################################
   # 等待 SSH 连接 or 超时
   ################################################
-  SECONDS=0
-  while [ $SECONDS -lt $SSH_WAIT_TIMEOUT ]; do
-    # 是否已有客户端连接
-    if tmate display -p '#{tmate_num_clients}' | grep -vq '^0$'; then
+  START=$(date +%s)
+
+  while true; do
+    CLIENTS=$(tmate -S "$SOCK" display -p '#{tmate_num_clients}')
+
+    if [ "$CLIENTS" -gt 0 ]; then
       echo "🔓 SSH client connected"
       echo "   Exit SSH session to continue CI"
-      tmate wait tmate-exit
+      tmate -S "$SOCK" wait tmate-session-closed
       echo "🔒 SSH session closed by user"
-      exit 0
+      break
     fi
-    sleep 2
-  done
 
-  echo "⏱ No SSH connection, timeout reached"
-  echo "🔒 Closing SSH session automatically"
-  tmate kill-session
+    NOW=$(date +%s)
+    if [ $((NOW - START)) -ge $SSH_WAIT_TIMEOUT ]; then
+      echo "⏱ No SSH connection, timeout reached"
+      echo "🔒 Closing SSH session automatically"
+      tmate -S "$SOCK" kill-session
+      break
+    fi
+
+    sleep 5
+  done
 else
   echo "ℹ️ ENABLE_SSH=false → SSH skipped"
 fi
