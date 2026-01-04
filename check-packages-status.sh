@@ -82,7 +82,8 @@ if [ "$ENABLE_SSH" = true ]; then
   WEB_CMD=$(tmate -S "$SOCK" display -p '#{tmate_web}')
 
   echo "==============================================="
-  echo " SSH session ready (max ${SSH_WAIT_TIMEOUT}s)"
+  #echo   #echo " SSH session ready (max ${SSH_WAIT_TIM
+  SSH_CMD=$(tmate -S "$SOCK" display -p '#{tmate_ssh}')
   echo
   echo " SSH : $SSH_CMD"
   echo " WEB : $WEB_CMD"
