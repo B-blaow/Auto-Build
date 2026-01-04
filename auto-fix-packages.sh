@@ -21,7 +21,7 @@ CHECK_PKGS=(
   nikki
   luci-app-nikki
   luci-i18n-nikki-zh-cn
-  nano
+  ddns-scripts-cloudflare
   cloudflared
   luci-app-cloudflared
   wireguard-tools
@@ -34,15 +34,8 @@ CHECK_PKGS=(
 ##################################################
 # 前置检查
 ##################################################
-if [ ! -f ".config" ]; then
-  echo "❌ .config not found, run make defconfig first"
-  exit 1
-fi
-
-if [ ! -x scripts/config/conf ]; then
-  echo "❌ scripts/config/conf not found"
-  exit 1
-fi
+[ -f ".config" ] || { echo "❌ .config not found"; exit 1; }
+[ -x "./scripts/config" ] || { echo "❌ scripts/config not found"; exit 1; }
 
 echo "================================================="
 echo " Auto-fix missing packages in .config"
@@ -65,7 +58,7 @@ for pkg in "${CHECK_PKGS[@]}"; do
     echo "⚠️ ${pkg}: is not set"
     if [ "$AUTO_FIX" = true ]; then
       echo "   🔧 enable ${pkg}"
-      scripts/config/conf -e "${SYMBOL}"
+      ./scripts/config set "${SYMBOL}" y || true
       FIXED=1
     else
       FAILED=1
@@ -75,7 +68,7 @@ for pkg in "${CHECK_PKGS[@]}"; do
     echo "❌ ${pkg}: not found in .config"
     if [ "$AUTO_FIX" = true ]; then
       echo "   🔧 enable ${pkg}"
-      scripts/config/conf -e "${SYMBOL}"
+      ./scripts/config set "${SYMBOL}" y || true
       FIXED=1
     else
       FAILED=1
@@ -84,7 +77,7 @@ for pkg in "${CHECK_PKGS[@]}"; do
 done
 
 ##################################################
-# 如果有修改，重新整理 .config
+# 重新整理 .config
 ##################################################
 if [ "$FIXED" = 1 ]; then
   echo
