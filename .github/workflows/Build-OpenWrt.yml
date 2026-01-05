@@ -43,13 +43,13 @@ jobs:
       - name: Run first script
         run: |
           cd $WORKDIR
-          FILE=$(ls $GITHUB_WORKSPACE/openwrt*.sh | sed -n '1p')
+          FILE=$(ls $GITHUB_WORKSPACE/openwrt/openwrt*.sh | sed -n '1p')
           chmod +x "$FILE"
           "$FILE"
 
       - name: Copy config
         run: |
-          cp $GITHUB_WORKSPACE/openwrt.config $WORKDIR/.config
+          mv $GITHUB_WORKSPACE/openwrt/.config $WORKDIR/.config
 
       - name: Feeds update
         run: |
@@ -60,7 +60,7 @@ jobs:
       - name: Run second script
         run: |
           cd $WORKDIR
-          FILE=$(ls $GITHUB_WORKSPACE/openwrt*.sh | sed -n '2p')
+          FILE=$(ls $GITHUB_WORKSPACE/openwrt/openwrt*.sh | sed -n '2p')
           chmod +x "$FILE"
           "$FILE"
 
