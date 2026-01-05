@@ -2,7 +2,7 @@
 set -e
 
 echo "================================================="
-echo " Auto-fix missing packages in .config (OpenWrt / ImmortalWrt)"
+echo " Auto-fix missing packages in .config (OpenWrt / ImmortalWrt专用)"
 echo "================================================="
 
 if [ ! -f ".config" ]; then
