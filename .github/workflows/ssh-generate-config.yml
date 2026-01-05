@@ -87,6 +87,7 @@ jobs:
         
 
         SOCK="/tmp/tmate.sock"
+        WAIT_SECONDS=1800
 
         tmate -S "$SOCK" new-session -d
         tmate -S "$SOCK" wait tmate-ready
@@ -101,6 +102,21 @@ jobs:
         echo " WEB : $WEB_CMD"
         echo
         echo "==============================================="
+
+        SECONDS=0
+        while [ $SECONDS -lt $WAIT_SECONDS ]; do
+        CLIENTS=$(tmate -S "$SOCK" display -p '#{tmate_num_clients}')
+          if [ "$CLIENTS" != "0" ]; then
+            echo "🔓 SSH client connected"
+            tmate -S "$SOCK" wait tmate-exit
+            echo "🔒 SSH session closed by user"
+            exit 0
+          fi
+          sleep 5
+        done
+
+        echo "⏱ SSH timeout reached, closing session"
+        tmate -S "$SOCK" kill-session
 
 
     - name: Save .config back to repo
