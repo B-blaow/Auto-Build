@@ -54,7 +54,7 @@ jobs:
 
       - name: Copy config
         run: |
-          mv $GITHUB_WORKSPACE/lede.config $WORKDIR/lede/.config
+          mv $GITHUB_WORKSPACE/lede/.config $WORKDIR/.config
 
       - name: Feeds update
         run: |
@@ -75,9 +75,9 @@ jobs:
           make clean
           make defconfig 
           chmod +x $GITHUB_WORKSPACE/check-packages-status.sh
-          #bash $GITHUB_WORKSPACE/check-packages-status.sh
-          chmod +x $GITHUB_WORKSPACE/auto-fix-packages.sh
-          bash $GITHUB_WORKSPACE/auto-fix-packages.sh
+          bash $GITHUB_WORKSPACE/check-packages-status.sh
+          #chmod +x $GITHUB_WORKSPACE/auto-fix-packages.sh
+          #bash $GITHUB_WORKSPACE/auto-fix-packages.sh
 
       - name: Compile
         run: |
