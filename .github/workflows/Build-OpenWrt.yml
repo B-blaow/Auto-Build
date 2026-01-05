@@ -70,9 +70,9 @@ jobs:
           make clean
           make defconfig
           chmod +x $GITHUB_WORKSPACE/check-packages-status.sh
-          #bash $GITHUB_WORKSPACE/check-packages-status.sh
-          chmod +x $GITHUB_WORKSPACE/auto-fix-packages-openwrt.sh
-          bash $GITHUB_WORKSPACE/auto-fix-packages-openwrt.sh
+          bash $GITHUB_WORKSPACE/check-packages-status.sh
+          #chmod +x $GITHUB_WORKSPACE/auto-fix-packages-openwrt.sh
+          #bash $GITHUB_WORKSPACE/auto-fix-packages-openwrt.sh
       - name: Compile
         run: |
           cd $WORKDIR
