@@ -87,18 +87,23 @@ jobs:
         tmate new-session -d
         tmate wait tmate-ready
 
-        echo "============================================"
-        echo " SSH is ready"
-        echo
-        echo " SSH : $(tmate display -p '#{tmate_ssh}')"
-        echo " WEB : $(tmate display -p '#{tmate_web}')"
-        echo
-        echo " 👉 在 SSH 中执行："
-        echo "   make menuconfig"
-        echo "   保存后 exit"
-        echo "============================================"
+        SOCK="/tmp/tmate.sock"
 
-        tmate wait tmate-exit
+        tmate -S "$SOCK" new-session -d
+        tmate -S "$SOCK" wait tmate-ready
+
+        SSH_CMD=$(tmate -S "$SOCK" display -p '#{tmate_ssh}')
+        WEB_CMD=$(tmate -S "$SOCK" display -p '#{tmate_web}')
+
+        echo "==============================================="
+        SSH_CMD=$(tmate -S "$SOCK" display -p '#{tmate_ssh}')
+        echo
+        echo " SSH : $SSH_CMD"
+        echo " WEB : $WEB_CMD"
+        echo
+        echo " No connection within ${SSH_WAIT_TIMEOUT}s → auto close"
+        echo "==============================================="
+
 
     - name: Save .config back to repo
       run: |
