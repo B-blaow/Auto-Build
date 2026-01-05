@@ -3,7 +3,7 @@ set -e
 
 ##################################################
 # 是否开启 SSH（true / false）
-# 默认 false，不会自动触发
+# 默认 false，不会自动触发,在第8行将false改为true开启SSH
 ##################################################
 ENABLE_SSH=false
 
@@ -19,6 +19,7 @@ SSH_WAIT_TIMEOUT=120
 ##################################################
 CHECK_PKGS=(
   luci-app-ttyd
+  nano
   mosdns
   luci-app-mosdns
   luci-i18n-mosdns-zh-cn
