@@ -23,6 +23,7 @@ SSH_WAIT_TIMEOUT=120
 CHECK_PKGS=(
   luci-app-ttyd
   nano
+  luci-app-oaf
   mosdns
   luci-app-mosdns
   luci-i18n-mosdns-zh-cn
