@@ -1,0 +1,65 @@
+name: Daily CI Environment Cleanup
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: 磁盘使用情况（清理前）
+        run: |
+          echo "=== BEFORE CLEANUP ==="
+          df -h
+          du -h --max-depth=1 / \
+            --exclude=/proc \
+            --exclude=/sys \
+            --exclude=/dev \
+            2>/dev/null | sort -hr | head -n 20
+
+      - name: 清理系统组件
+        run: |
+          sudo rm -rf /usr/share/dotnet || true
+          sudo rm -rf /opt/ghc || true
+          sudo rm -rf /usr/local/lib/android || true
+          sudo rm -rf /opt/hostedtoolcache || true
+
+      - name: 清理 Docker
+        run: |
+          sudo docker system prune -af || true
+
+      - name: 清理 APT / 日志 / 临时文件
+        run: |
+          sudo apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
+          sudo rm -rf /var/log/*
+          sudo rm -rf /tmp/* /var/tmp/*
+
+      # ⭐ 核心修复：不碰 swapfile
+      - name: 清理 /mnt（保留 swapfile）
+        run: |
+          echo "Cleaning /mnt except swapfile"
+          sudo find /mnt -mindepth 1 -maxdepth 1 ! -name swapfile -exec rm -rf {} +
+          sudo mkdir -p /mnt
+          sudo chown $USER:$USER /mnt
+
+      - name: 磁盘使用情况（清理后）
+        run: |
+          echo "=== AFTER CLEANUP ==="
+          df -h
+          du -h --max-depth=1 / \
+            --exclude=/proc \
+            --exclude=/sys \
+            --exclude=/dev \
+            2>/dev/null | sort -hr | head -n 20
+
+      - name: Cleanup Done
+        run: echo "✅ Runner cleanup finished safely"
