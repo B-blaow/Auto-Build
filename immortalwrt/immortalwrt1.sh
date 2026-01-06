@@ -6,4 +6,4 @@
 #echo 'src-git passwall https://github.com/xiaorouji/openwrt-passwall' >>feeds.conf.default
 
 #OpenAppFilter    
-#git clone https://github.com/destan19/OpenAppFilter.git package/OpenAppFilter    
+git clone https://github.com/destan19/OpenAppFilter.git package/OpenAppFilter    
