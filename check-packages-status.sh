@@ -24,6 +24,9 @@ CHECK_PKGS=(
   luci-app-ttyd
   nano
   luci-app-oaf
+  open-app-filter
+  oaf
+  htop
   mosdns
   luci-app-mosdns
   luci-i18n-mosdns-zh-cn
