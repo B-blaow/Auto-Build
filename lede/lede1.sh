@@ -14,7 +14,7 @@ echo 'src-git helloworld https://github.com/fw876/helloworld' >>feeds.conf.defau
 #OpenAppFilter    
 ＃git clone https://github.com/destan19/OpenAppFilter.git package/OpenAppFilter
 
-#加入nano
+#add nano
 git clone --depth=1 \
   https://github.com/openwrt/packages.git \
   -b master \
