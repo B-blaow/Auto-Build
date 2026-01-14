@@ -1,4 +1,4 @@
-name: CI Environment Cleanup
+name: CI Environment Cleanup (Aggressive)
 
 on:
   workflow_run:
@@ -17,10 +17,11 @@ permissions:
 jobs:
   cleanup:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
 
     steps:
-      - name: 磁盘使用情况（清理前）
+      - name: BEFORE CLEANUP — Disk Usage
+        if: ${{ always() }}
         run: |
           echo "=== BEFORE CLEANUP ==="
           df -h
@@ -30,32 +31,100 @@ jobs:
             --exclude=/dev \
             2>/dev/null | sort -hr | head -n 20
 
-      - name: 清理系统组件
+      # -----------------------------
+      # 系统预装组件
+      # -----------------------------
+      - name: Remove Preinstalled SDKs & Toolchains
+        if: ${{ always() }}
         run: |
           sudo rm -rf /usr/share/dotnet || true
           sudo rm -rf /opt/ghc || true
           sudo rm -rf /usr/local/lib/android || true
           sudo rm -rf /opt/hostedtoolcache || true
 
-      - name: 清理 Docker
+      # -----------------------------
+      # 语言环境缓存
+      # -----------------------------
+      - name: Clean Node / npm / yarn
+        if: ${{ always() }}
+        run: |
+          sudo rm -rf ~/.npm
+          sudo rm -rf ~/.cache/yarn
+          sudo rm -rf ~/.nvm
+
+      - name: Clean Python / pip
+        if: ${{ always() }}
+        run: |
+          sudo rm -rf ~/.cache/pip
+          sudo rm -rf /usr/local/lib/python*/dist-packages
+
+      - name: Clean Rust / Cargo
+        if: ${{ always() }}
+        run: |
+          sudo rm -rf ~/.cargo
+          sudo rm -rf ~/.rustup
+
+      - name: Clean Go Modules
+        if: ${{ always() }}
+        run: |
+          sudo rm -rf ~/go/pkg/mod
+          sudo rm -rf ~/go/bin
+
+      - name: Clean Homebrew
+        if: ${{ always() }}
+        run: |
+          sudo rm -rf ~/Library/Caches/Homebrew
+          sudo rm -rf /home/linuxbrew/.linuxbrew/Cellar
+          sudo rm -rf /home/linuxbrew/.linuxbrew/Homebrew
+
+      # -----------------------------
+      # Docker
+      # -----------------------------
+      - name: Docker prune
+        if: ${{ always() }}
         run: |
           sudo docker system prune -af || true
 
-      - name: 清理 APT / 日志 / 临时文件
+      - name: Deep clean Docker overlay2
+        if: ${{ always() }}
+        run: |
+          sudo rm -rf /var/lib/docker/overlay2/*
+
+      # -----------------------------
+      # APT / 日志 / 临时文件
+      # -----------------------------
+      - name: Clean APT & Logs
+        if: ${{ always() }}
         run: |
           sudo apt-get clean
+          sudo apt-get autoremove -y
+          sudo apt-get autoclean -y
           sudo rm -rf /var/lib/apt/lists/*
           sudo rm -rf /var/log/*
           sudo rm -rf /tmp/* /var/tmp/*
 
-      - name: 清理 /mnt（保留 swapfile）
+      - name: Clean systemd journal
+        if: ${{ always() }}
+        run: |
+          sudo journalctl --rotate
+          sudo journalctl --vacuum-time=1s
+
+      # -----------------------------
+      # mnt（保留 swapfile）
+      # -----------------------------
+      - name: Clean /mnt except swapfile
+        if: ${{ always() }}
         run: |
           echo "Cleaning /mnt except swapfile"
           sudo find /mnt -mindepth 1 -maxdepth 1 ! -name swapfile -exec rm -rf {} +
           sudo mkdir -p /mnt
           sudo chown $USER:$USER /mnt
 
-      - name: 磁盘使用情况（清理后）
+      # -----------------------------
+      # 清理后磁盘使用情况
+      # -----------------------------
+      - name: AFTER CLEANUP — Disk Usage
+        if: ${{ always() }}
         run: |
           echo "=== AFTER CLEANUP ==="
           df -h
@@ -66,4 +135,5 @@ jobs:
             2>/dev/null | sort -hr | head -n 20
 
       - name: Cleanup Done
-        run: echo "✅ Runner cleanup finished safely"
+        if: ${{ always() }}
+        run: echo "🔥 Aggressive runner cleanup completed"
