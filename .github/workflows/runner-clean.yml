@@ -1,9 +1,14 @@
-name: Daily CI Environment Cleanup
+name: CI Environment Cleanup
 
 on:
-  schedule:
-    - cron: "0 6 * * *"
-  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - SSH Generate & Save .config
+      - Build OpenWrt
+      - Build LEDE
+      - Build ImmortalWrt
+    types:
+      - completed
 
 permissions:
   actions: write
@@ -43,7 +48,6 @@ jobs:
           sudo rm -rf /var/log/*
           sudo rm -rf /tmp/* /var/tmp/*
 
-      # ⭐ 核心修复：不碰 swapfile
       - name: 清理 /mnt（保留 swapfile）
         run: |
           echo "Cleaning /mnt except swapfile"
