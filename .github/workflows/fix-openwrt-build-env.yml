@@ -1,0 +1,48 @@
+name: Fix OpenWrt Build Environment
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fix-env:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Restore OpenWrt host build environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            clang \
+            flex \
+            bison \
+            g++ \
+            gawk \
+            gcc \
+            gettext \
+            git \
+            libncurses5-dev \
+            libssl-dev \
+            python3 \
+            python3-pip \
+            python3-setuptools \
+            python3-distutils \
+            rsync \
+            unzip \
+            zlib1g-dev \
+            file \
+            wget \
+            curl \
+            cmake \
+            ninja-build \
+            pkg-config \
+            libglib2.0-dev \
+            libdbus-1-dev \
+            libelf-dev \
+            libtool \
+            autoconf \
+            automake \
+            perl
+
+      - name: Environment fixed
+        run: echo "✅ OpenWrt build environment has been restored successfully."
