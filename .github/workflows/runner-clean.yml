@@ -52,14 +52,18 @@ jobs:
       - name: 清理 APT / 日志 / 临时文件
         run: |
           sudo apt-get clean || true
-          sudo rm -rf /var/lib/apt/lists/* || true
           sudo find /var/log -type f -delete || true
           sudo rm -rf /tmp/* /var/tmp/* || true
 
-      - name: 清理 runner 工作目录
+      - name: 清理 OpenWrt 编译产物
         run: |
-          sudo rm -rf /home/runner/work/* || true
-          sudo rm -rf /home/runner/_work/* || true
+          echo "Cleaning OpenWrt build artifacts but keeping repo"
+          # 删除常见的编译产物目录
+          sudo rm -rf $GITHUB_WORKSPACE/bin || true
+          sudo rm -rf $GITHUB_WORKSPACE/build_dir || true
+          sudo rm -rf $GITHUB_WORKSPACE/staging_dir || true
+          sudo rm -rf $GITHUB_WORKSPACE/tmp || true
+          sudo rm -rf $GITHUB_WORKSPACE/dl || true
 
       - name: 清理 /mnt（保留 swapfile）
         run: |
