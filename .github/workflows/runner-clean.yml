@@ -54,17 +54,7 @@ jobs:
           sudo apt-get clean || true
           sudo find /var/log -type f -delete || true
           sudo rm -rf /tmp/* /var/tmp/* || true
-
-      - name: 清理 OpenWrt 编译产物
-        run: |
-          echo "Cleaning OpenWrt build artifacts but keeping repo"
-          # 删除常见的编译产物目录
-          sudo rm -rf $GITHUB_WORKSPACE/bin || true
-          sudo rm -rf $GITHUB_WORKSPACE/build_dir || true
-          sudo rm -rf $GITHUB_WORKSPACE/staging_dir || true
-          sudo rm -rf $GITHUB_WORKSPACE/tmp || true
-          sudo rm -rf $GITHUB_WORKSPACE/dl || true
-
+          
       - name: 清理 /mnt（保留 swapfile）
         run: |
           echo "Cleaning /mnt except swapfile"
