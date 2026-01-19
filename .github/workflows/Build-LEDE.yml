@@ -26,6 +26,8 @@ jobs:
 
       - name: Prepare system
         run: |
+          sudo -E timedatectl set-timezone "Asia/Shanghai"
+          date
           sudo rm -rf /usr/share/dotnet || true
           sudo rm -rf /opt/ghc || true
           sudo rm -rf /usr/local/lib/android || true
