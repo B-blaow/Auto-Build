@@ -2,11 +2,6 @@ name: Build OpenWrt
 
 on:
   workflow_dispatch:
-    inputs:
-      ssh:
-        description: 'Enable SSH'
-        required: false
-        default: 'false'
   schedule:
     - cron: '0 0 1 * *'
 
@@ -16,7 +11,6 @@ env:
   WORKDIR: /mnt/openwrt
   CCACHE_DIR: /mnt/ccache_openwrt
   CCACHE_MAXSIZE: 10G
-  SSH_ENABLE: ${{ github.event.inputs.ssh || 'false' }}
 
 jobs:
   build:
@@ -81,7 +75,7 @@ jobs:
           chmod +x $GITHUB_WORKSPACE/check-packages-status.sh
           bash $GITHUB_WORKSPACE/check-packages-status.sh
           chmod +x $GITHUB_WORKSPACE/auto-fix-packages-openwrt.sh
-          #####删除注释恢复运行#####
+          ##### Remove comment‑restore function #####
           #bash $GITHUB_WORKSPACE/auto-fix-packages-openwrt.sh
       - name: Compile
         run: |
@@ -99,9 +93,9 @@ jobs:
           cd $WORKDIR
           rm -rf bin/packages || true
           rm -rf bin/targets/*/*/packages || true
-          #如果未来目录层级产生变化使用以下命令删除packages
+          # If directory structure changes in the future, use this to delete packages
           #find bin -type d -name packages -exec rm -rf {} + || true
-          ls -lh openwrt_bin.zip || echo "zip 不存在"
+          #ls -lh openwrt_bin.zip || echo "zip file does not exist"
           rm -f openwrt_bin.zip || true
           find bin/targets -maxdepth 3 -type f ! -path "*/packages/*" -print | zip -j openwrt_bin.zip -@
 
