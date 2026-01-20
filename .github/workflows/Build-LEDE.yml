@@ -68,7 +68,7 @@ jobs:
       - name: download
         run: |
           cd $WORKDIR
-          make download -j16
+          make download -j8
 
       - name: Prepare config
         run: |
@@ -91,7 +91,7 @@ jobs:
           export PATH="/usr/lib/ccache:$PATH"
           export CCACHE_DIR=$CCACHE_DIR
           ccache -M $CCACHE_MAXSIZE
-          make -j1
+          make -j$(nproc) || make -j1
 
       - name: Package bin
         run: |
