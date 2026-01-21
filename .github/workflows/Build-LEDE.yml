@@ -3,7 +3,7 @@ name: Build LEDE
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 21 * *'
+    - cron: '0 0 3 * *'
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
@@ -93,22 +93,22 @@ jobs:
           ccache -M $CCACHE_MAXSIZE
           make -j$(nproc) || make -j1
 
-      - name: Package bin
+      - name: Package firmware
         run: |
           cd $WORKDIR
           rm -rf bin/packages || true
           rm -rf bin/targets/*/*/packages || true
           # If directory structure changes in the future, use this to delete packages
           # find bin -type d -name packages -exec rm -rf {} + || true
-          #ls -lh lede_bin.zip || echo "zip file does not exist"
-          rm -f lede_bin.zip || true
-          find bin/targets -maxdepth 3 -type f ! -path "*/packages/*" -print | zip -j lede_bin.zip -@
+          #ls -lh lede_firmware.zip || echo "zip file does not exist"
+          rm -f lede_firmware.zip || true
+          find bin/targets -maxdepth 3 -type f ! -path "*/packages/*" -print | zip -j lede_firmware.zip -@
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: lede_bin
-          path: ${{ env.WORKDIR }}/lede_bin.zip
+          name: lede_firmware
+          path: ${{ env.WORKDIR }}/lede_firmware.zip
 
       - name: Create tag
         run: |
@@ -121,6 +121,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG_NAME }}
-          files: ${{ env.WORKDIR }}/lede_bin.zip
+          files: ${{ env.WORKDIR }}/lede_firmware.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
