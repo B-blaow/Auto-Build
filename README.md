@@ -11,16 +11,16 @@ GitHub Actions CI 的 OpenWrt / ImmortalWrt / LEDE 自动化编译仓库，
 
 ⚠️ make defconfig 静默取消已选包
 
-🔧 自动检测 / 修复 .config 中丢失的包（默认调用check-packages-status.sh只检测，默认不连接ssh，修改脚本可以连接ssh）
+🔧 自动检测 / 修复 .config 中丢失的包（默认调用check-packages.sh只检测）可选check-packages-status.sh检测加连接ssh修复
 
 
 1️⃣ 解决 GitHub Actions 空间不足问题
 
-GitHub Actions 默认只有约 14GB 可用空间，直接编译 OpenWrt 极易失败。
+GitHub Actions 默认只有约 23GB 可用空间，直接编译 OpenWrt 极易失败。
 
 本仓库采用以下策略稳定释放空间：
 
-使用 /mnt 作为编译工作目录（默认约66GB可用空间）
+使用 /mnt 作为编译工作目录（约66GB可用空间）
 
 显式清理无用软件与缓存
 
