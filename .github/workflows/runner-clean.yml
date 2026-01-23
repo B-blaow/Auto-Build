@@ -38,19 +38,37 @@ jobs:
           sudo rm -rf /opt/ghc || true
           sudo rm -rf /usr/local/lib/android || true
 
-      - name: 条件化清理 Docker（检测容器）
+      - name: Conditional Docker cleanup (smart detection)
         run: |
           echo "=== Docker Cleanup ==="
-          RUNNING_CONTAINERS=$(sudo docker ps -q || true)
+
+          # Check if docker CLI exists
+          if ! command -v docker >/dev/null 2>&1; then
+            echo "❌ Docker CLI not found, skipping cleanup"
+            exit 0
+          fi
+
+          # Check if Docker daemon is running
+          if ! docker info >/dev/null 2>&1; then
+            echo "❌ Docker daemon not running, skipping cleanup"
+            exit 0
+          fi
+
+          echo "✔ Docker daemon detected, starting cleanup..."
+
+          RUNNING_CONTAINERS=$(docker ps -q || true)
+
           if [ -n "$RUNNING_CONTAINERS" ]; then
-            echo "⚠️ 检测到有正在运行的容器，跳过 /var/lib/docker 删除"
+            echo "⚠️ Running containers detected, performing prune only"
             sudo docker system prune -af || true
           else
-            echo "✅ 没有运行中的容器，执行深度清理"
+            echo "✅ No running containers, performing deep cleanup"
             sudo docker system prune -af || true
+            echo "🧹 Removing /var/lib/docker to free maximum space"
             sudo rm -rf /var/lib/docker || true
           fi
 
+          echo "=== Docker Cleanup Done ==="
       - name: 清理 APT / 日志 / 临时文件
         run: |
           sudo apt-get clean || true
