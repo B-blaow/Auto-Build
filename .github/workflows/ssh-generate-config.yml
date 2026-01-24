@@ -12,6 +12,8 @@ on:
           - openwrt
           - immortalwrt
           - lede
+          - immortalwrt_798x
+          - istoreos
 
       save_to_repo:
         description: 'Save generated .config back to repository'
@@ -66,6 +68,12 @@ jobs:
             ;;
           lede)
             git clone https://github.com/coolsnowwolf/lede.git .
+            ;;
+          immortalwrt_798x)
+            git clone https://github.com/hanwckf/immortalwrt-mt798x .
+            ;;
+          istoreos)
+            git clone https://github.com/istoreos/istoreos .
             ;;
         esac
 
